@@ -20,16 +20,45 @@ let App = {
   appStoreUrl: ''
 }
 
-async function addAppToDB() {
-  const { data: applications } = await supabase
-    .from("applications")
-    .insert([
-      { appName: App.appName, appStoreUrl: App.appStoreUrl }
-    ])
-    .select()
-
-    console.log(applications, 98764);
+let Push = {
+  pushTitle: '',
+  pushBody: '',
+  appName: '',
 }
+
+// создание пуша
+bot.command('ptitle', (сtx) => {
+  Push.pushTitle = сtx.payload
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+})
+
+bot.command('pbody', (сtx) => {
+  Push.pushBody = сtx.payload
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+})
+
+bot.command('pname', (сtx) => {
+  Push.appName = сtx.payload
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+})
+
+bot.command('sendpush', async (ctx) => {
+  if (Push.pushTitle) {
+    if (Push.pushBody) {
+      if (Push.appName) {
+        await addPushToDB();
+        ctx.reply(`*${Push.pushTitle}*\n${Push.pushBody}\n${Push.appName}`, { parse_mode: 'Markdown' });
+        return;
+      } else {
+        ctx.reply(`Не указано приложение`);
+      }
+    } else {
+      ctx.reply(`Не указано тело пуша`);
+    }
+  } else {
+    ctx.reply(`Не указан заголовок пуша`);
+  }
+});
 
 bot.command('app', (сtx) => { // Добавляем название приложения
   App.appName = сtx.payload
@@ -44,14 +73,59 @@ bot.command('url', (сtx) => { // Добавляем ссылку на App Store
 bot.command('clear', (сtx) => { // Добавляем ссылку на App Store
   App.appName = '';
   App.appStoreUrl = '';
-  сtx.reply(`Название: *${App.appName}*,\nApp Store: ${App.appStoreUrl}`, { parse_mode: 'Markdown' })
+  Push.pushTitle = '';
+  Push.pushBody = ''; 
+  Push.appName = '';
+  сtx.reply(`Название: *${App.appName}*,\nApp Store: ${App.appStoreUrl},\nЗаголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
 })
 
-bot.command('sb', async () => {
-  await addAppToDB();
+bot.command('sb', async (ctx) => {
+  App.appName ? await addAppToDB() : ctx.reply('Нет приложения');
   // do something else if needed
   return;
 });
+
+bot.command('applist', async (ctx) => {
+  const { data: applications, error } = await supabase
+    .from("applications")
+    .select("appName")
+    .order("appName", { ascending: true })
+
+  const appList = JSON.stringify(applications?.map((item) => `${item.appName}`))
+    .replace(/[\[\]"]+/g, '').replace(/,/g, '\n');
+  
+
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(applications);
+    ctx.reply(appList, { parse_mode: 'Markdown' });
+  }
+})
+
+
+//MARK: ФУНКЦИИ
+async function addPushToDB() {
+  const { data: notifications, error } = await supabase
+    .from("notifications")
+    .insert([
+      { pushTitle: Push.pushTitle, pushBody: Push.pushBody, appName: Push.appName }
+    ])
+    .select()
+
+    console.log(notifications);
+}
+
+async function addAppToDB() {
+  const { data: applications } = await supabase
+    .from("applications")
+    .insert([
+      { appName: App.appName, appStoreUrl: App.appStoreUrl }
+    ])
+    .select()
+
+    console.log(applications);
+}
 
 //prod mode (Vercel)
 export const startVercel = async (req: VercelRequest, res: VercelResponse) => {
