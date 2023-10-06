@@ -114,6 +114,26 @@ bot.command('applist', async (ctx) => {
   }
 })
 
+bot.command('pushlist', async (ctx) => {
+  const appName = ctx.payload;
+
+  const { data: notifications, error } = await supabase
+    .from("notifications")
+    .select("pushTitle, pushBody, pushTime")
+    .filter("appName", "eq", appName)
+
+  const pushList = JSON.stringify(notifications?.map((item) => `${item.pushTitle}\n${item.pushBody}\n${item.pushTime}`))
+    // .replace(/[\[\]"]+/g, '').replace(/,/g, '\n');
+  
+
+  if (error) {
+    console.log(error);
+  } else {
+    console.log(notifications);
+    ctx.reply(pushList, { parse_mode: 'Markdown' });
+  }
+})
+
 
 //MARK: ФУНКЦИИ
 async function addPushToDB() {
