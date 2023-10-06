@@ -123,7 +123,7 @@ bot.command('pushlist', async (ctx) => {
     .filter("appName", "eq", appName)
     .order("created_at", { ascending: false });
 
-  const pushList = JSON.stringify(notifications?.map((item) => `${item.pushTime},---${item.pushTitle},---${item.pushBody}`))
+  const pushList = JSON.stringify(notifications?.map((item) => `,🌺${item.pushTime},---${item.pushTitle},---${item.pushBody}`))
     .replace(/[\[\]"]+/g, '').replace(/,/g, '\n');
   
 
