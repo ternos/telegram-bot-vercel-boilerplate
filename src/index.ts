@@ -54,7 +54,7 @@ bot.command('sendpush', async (ctx) => {
       if (Push.appName) {
         if (Push.pushTime) {
           await addPushToDB();
-          ctx.reply(`*${Push.pushTitle}*\n${Push.pushBody}\n${Push.appName}`, { parse_mode: 'Markdown' });
+          ctx.reply(`✅ *${Push.pushTitle}*\n${Push.pushBody}\n${Push.appName}\n${Push.pushTime}`, { parse_mode: 'Markdown' });
           return;
         } else {
           ctx.reply(`Не указано время`);
@@ -86,7 +86,8 @@ bot.command('clear', (сtx) => { // Добавляем ссылку на App Sto
   Push.pushTitle = '';
   Push.pushBody = ''; 
   Push.appName = '';
-  сtx.reply(`Название: *${App.appName}*,\nApp Store: ${App.appStoreUrl},\nЗаголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+  Push.pushTime = '';
+  сtx.reply(`Название: *${App.appName}*,\nApp Store: ${App.appStoreUrl},\nЗаголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\Время: ${Push.pushTime}`, { parse_mode: 'Markdown' })
 })
 
 bot.command('sb', async (ctx) => {
