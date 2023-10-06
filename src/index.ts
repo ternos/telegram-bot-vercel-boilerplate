@@ -24,31 +24,41 @@ let Push = {
   pushTitle: '',
   pushBody: '',
   appName: '',
+  pushTime: ''
 }
 
 // создание пуша
 bot.command('ptitle', (сtx) => {
   Push.pushTitle = сtx.payload
-  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\nВремя: ${Push.pushTime}`, { parse_mode: 'Markdown' })
 })
 
 bot.command('pbody', (сtx) => {
   Push.pushBody = сtx.payload
-  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\nВремя: ${Push.pushTime}`, { parse_mode: 'Markdown' })
 })
 
 bot.command('pname', (сtx) => {
   Push.appName = сtx.payload
-  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}`, { parse_mode: 'Markdown' })
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\nВремя: ${Push.pushTime}`, { parse_mode: 'Markdown' })
+})
+
+bot.command('ptime', (сtx) => {
+  Push.appName = сtx.payload
+  сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\nВремя: ${Push.pushTime}`, { parse_mode: 'Markdown' })
 })
 
 bot.command('sendpush', async (ctx) => {
   if (Push.pushTitle) {
     if (Push.pushBody) {
       if (Push.appName) {
-        await addPushToDB();
-        ctx.reply(`*${Push.pushTitle}*\n${Push.pushBody}\n${Push.appName}`, { parse_mode: 'Markdown' });
-        return;
+        if (Push.pushTime) {
+          await addPushToDB();
+          ctx.reply(`*${Push.pushTitle}*\n${Push.pushBody}\n${Push.appName}`, { parse_mode: 'Markdown' });
+          return;
+        } else {
+          ctx.reply(`Не указано время`);
+        }        
       } else {
         ctx.reply(`Не указано приложение`);
       }
@@ -109,7 +119,7 @@ async function addPushToDB() {
   const { data: notifications, error } = await supabase
     .from("notifications")
     .insert([
-      { pushTitle: Push.pushTitle, pushBody: Push.pushBody, appName: Push.appName }
+      { pushTitle: Push.pushTitle, pushBody: Push.pushBody, appName: Push.appName, pushTime: Push.pushTime }
     ])
     .select()
 
