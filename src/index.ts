@@ -44,7 +44,7 @@ bot.command('pname', (сtx) => {
 })
 
 bot.command('ptime', (сtx) => {
-  Push.appName = сtx.payload
+  Push.pushTime = сtx.payload
   сtx.reply(`Заголовок: *${Push.pushTitle}*,\nСообщение: ${Push.pushBody}\nПриложение: ${Push.appName}\nВремя: ${Push.pushTime}`, { parse_mode: 'Markdown' })
 })
 
