@@ -119,8 +119,9 @@ bot.command('pushlist', async (ctx) => {
 
   const { data: notifications, error } = await supabase
     .from("notifications")
-    .select("pushTitle, pushBody, pushTime")
+    .select("pushTitle, pushBody, pushTime, created_at")
     .filter("appName", "eq", appName)
+    .order("created_at", { ascending: false });
 
   const pushList = JSON.stringify(notifications?.map((item) => `${item.pushTime},---${item.pushTitle},---${item.pushBody}`))
     .replace(/[\[\]"]+/g, '').replace(/,/g, '\n');
